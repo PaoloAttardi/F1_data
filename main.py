@@ -1,5 +1,6 @@
 from flask import Flask
 from flask import render_template
+from flask import request
 import fastf1 as ff1
 import datetime
 import requests
@@ -21,13 +22,18 @@ def getEventsList():
      constructor_Standings=constructor_Standings['MRData']['StandingsTable']["StandingsLists"][0]['ConstructorStandings'],
      driver_Standings=driver_Standings['MRData']['StandingsTable']["StandingsLists"][0]['DriverStandings'])
 
-@app.route("/<int:round>/<string:session>")
+@app.route("/<int:round>/<string:session>", methods = ['GET', 'POST'])
 def getEvent(round, session):
     x = datetime.datetime.now()
     event = ff1.get_session(x.year,round,session)
     event.load()
     result = event.results
-    return render_template('dataView.html', drivers=event.drivers, result=result.values.tolist())
+    if(request.method == 'POST'):
+        print(request.form['FirstDriver'])
+        return render_template('dataAnalisys.html', drivers=event.drivers, result=result.values.tolist(), session_name = event.event.EventName,
+    session_type = session)
+    return render_template('dataView.html', drivers=event.drivers, result=result.values.tolist(), session_name = event.event.EventName,
+    session_type = session)
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=8080, debug=True)
