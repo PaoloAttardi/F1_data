@@ -5,7 +5,7 @@ import fastf1 as ff1
 import datetime
 import requests
 
-from analisys import DataTelemetry
+from analisys import DataTelemetry, RaceAnalisys
 
 ff1.Cache.enable_cache('cache')
 
@@ -64,6 +64,10 @@ def getEvent(round, session):
         typeOfAnalisys = request.form['Type']
         if(typeOfAnalisys == 'Telemetry'):
             file_name = DataTelemetry(firstDriver, secondDriver, event)
+            return render_template('dataAnalisys.html', drivers=drivers, result=result.values.tolist(), session_name = event.event.EventName,
+                session_type = session, file_name=file_name)
+        else:
+            file_name = RaceAnalisys(firstDriver, secondDriver, event)
             return render_template('dataAnalisys.html', drivers=drivers, result=result.values.tolist(), session_name = event.event.EventName,
                 session_type = session, file_name=file_name)
     return render_template('dataView.html', drivers=drivers, result=result.values.tolist(), session_name = event.event.EventName,
