@@ -7,7 +7,7 @@ import requests
 
 from analisys import DataTelemetry, RaceAnalisys
 
-ff1.Cache.enable_cache('cache')
+ff1.Cache.enable_cache('../cache')
 
 driverName = {
     '1': 'VER',
