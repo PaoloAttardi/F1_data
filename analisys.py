@@ -128,7 +128,7 @@ def RaceAnalisys(driver_1, driver_2, race):
     plt.rcParams['figure.figsize'] = [10, 10]
 
     # Create 2 subplots (1 for the boxplot, 1 for the lap-by-lap comparison)
-    fig, ax = plt.subplots(2)
+    fig, ax = plt.subplots(3)
 
     drivers_to_visualize = [driver_1, driver_2]
 
@@ -188,6 +188,56 @@ def RaceAnalisys(driver_1, driver_2, race):
         
         # Add the team to the visualized teams variable so that the next time the linestyle will be different
         visualized_teams.append(team)
+
+    # Add the strategy analisys to the plot
+    driver_stints = laps[['Driver', 'Stint', 'Compound', 'LapNumber']].groupby(
+    ['Driver', 'Stint', 'Compound']).count().reset_index()
+
+    driver_stints = driver_stints.rename(columns={'LapNumber': 'StintLength'})
+
+    driver_stints = driver_stints.sort_values(by=['Stint'])
+
+    compound_colors = {
+        'SOFT': '#FF3333',
+        'MEDIUM': '#FFF200',
+        'HARD': '#EBEBEB',
+        'INTERMEDIATE': '#39B54A',
+        'WET': '#00AEEF',
+        'UNKNOWN': '#55FF55'
+    }
+
+    plt.rcParams["figure.figsize"] = [15, 10]
+    plt.rcParams["figure.autolayout"] = True
+
+    for driver in drivers_to_visualize:
+        stints = driver_stints.loc[driver_stints['Driver'] == driver]
+        
+        previous_stint_end = 0
+        for _, stint in stints.iterrows():
+            print(stint)
+            plt.barh(
+                [driver], 
+                stint['StintLength'], 
+                left=previous_stint_end, 
+                color=compound_colors[stint.get('Compound')], 
+                edgecolor = "black"
+            )
+            
+            previous_stint_end = previous_stint_end + stint['StintLength']
+            
+    # Set title
+    # plt.title(f'Race strategy')
+            
+    # Set x-label
+    plt.xlabel('Lap')
+
+    # Invert y-axis 
+    plt.gca().invert_yaxis()
+
+    # Remove frame from plot
+    ax[2].spines['top'].set_visible(False)
+    ax[2].spines['right'].set_visible(False)
+    ax[2].spines['left'].set_visible(False)
 
     plt.savefig(plot_filename, dpi=300)
     return plot_filename
