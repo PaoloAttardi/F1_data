@@ -1,226 +1,104 @@
-<!doctype html>
-<html lang="en">
+{% extends 'navbar.html'%}
+{% block content %}
+<!--<script>
+    const queryString = window.location.href;
+    const url = queryString.split('/')
+    if (url[4] == 'Qualifying') {
 
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>F1 Data</title>
-    <script src="https://momentjs.com/downloads/moment.min.js"></script>
-    <script type="text/javascript">moment().format('mm:ss.sss');</script>
-
-    <!-- Bootstrap core CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-</head>
-
-<body>
-
-    <nav class="navbar navbar-expand-md navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">Fixed navbar</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
-                aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarCollapse">
-                <ul class="navbar-nav me-auto mb-2 mb-md-0">
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Link</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
-                    </li>
-                </ul>
-                <form class="d-flex">
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-outline-success" type="submit">Search</button>
-                </form>
+    }
+</script>-->
+<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+    <form method="post">
+        <div
+            class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">Select Drivers and type of Analisys</h1>
+        </div>
+        <div class="row">
+            <div class="col">
+                <select class="form-control" id="FirstDriver" name="FirstDriver">
+                    <option value="" selected disabled>First Driver Number</option>
+                    {% for driver in drivers %}
+                    <option value={{driver}}>{{driver}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col">
+                <select class="form-control" id="SecondDriver" name="SecondDriver">
+                    <option value="" selected disabled>Second Driver Number</option>
+                    {% for driver in drivers %}
+                    <option value={{driver}}>{{driver}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col">
+                <select class="form-control" id="Type" name="Type">
+                    <option value="" selected disabled>Type of Analisys</option>
+                    <option value="Telemetry">Telemetry</option>
+                    <option value="Race">Race pace</option>
+                </select>
+            </div>
+            <div class="col">
+                <button type="submit" class="btn btn-primary mb-3">Search</button>
             </div>
         </div>
-    </nav>
-    <div class="container-fluid">
-        <div class="row">
-            <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
-                <div class="position-sticky pt-3">
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="#">
-                                <span data-feather="home"></span>
-                                Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <span data-feather="file"></span>
-                                Orders
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <span data-feather="shopping-cart"></span>
-                                Products
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <span data-feather="users"></span>
-                                Customers
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <span data-feather="bar-chart-2"></span>
-                                Reports
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <span data-feather="layers"></span>
-                                Integrations
-                            </a>
-                        </li>
-                    </ul>
+    </form>
 
-                    <h6
-                        class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-                        <span>Saved reports</span>
-                        <a class="link-secondary" href="#" aria-label="Add a new report">
-                            <span data-feather="plus-circle"></span>
-                        </a>
-                    </h6>
-                    <ul class="nav flex-column mb-2">
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <span data-feather="file-text"></span>
-                                Current month
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <span data-feather="file-text"></span>
-                                Last quarter
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <span data-feather="file-text"></span>
-                                Social engagement
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <span data-feather="file-text"></span>
-                                Year-end sale
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
-            <script>
-                const queryString = window.location.href;
-                const url = queryString.split('/')
-                if (url[4] == 'Qualifying') {
+    {% block data %} {% endblock %}
 
-                }
-            </script>
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-                <form method="post">
-                    <div
-                        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                        <h1 class="h2">Select Drivers and type of Analisys</h1>
-                    </div>
-                    <div class="row">
-                        <div class="col">
-                            <select class="form-control" id="FirstDriver" name="FirstDriver">
-                                <option value="" selected disabled>First Driver Number</option>
-                                {% for driver in drivers %}
-                                <option value={{driver}}>{{driver}}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col">
-                            <select class="form-control" id="SecondDriver" name="SecondDriver">
-                                <option value="" selected disabled>Second Driver Number</option>
-                                {% for driver in drivers %}
-                                <option value={{driver}}>{{driver}}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col">
-                            <select class="form-control" id="Type" name="Type">
-                                <option value="" selected disabled>Type of Analisys</option>
-                                <option value="Telemetry">Telemetry</option>
-                                <option value="Race">Race pace</option>
-                            </select>
-                        </div>
-                        <div class="col">
-                            <button type="submit" class="btn btn-primary mb-3">Search</button>
-                        </div>
-                    </div>
-                </form>
-
-                {% block content %}
-
-                {% endblock %}
-                <h2>Session Result - {{session_name}} - {{session_type}}</h2>
-                <div class="table-responsive">
-                    <table class="table table-striped table-sm">
-                        <!--<img class="card-img background" src={{ url_for('static', filename='background/Baharein.jpeg') }}>-->
-                        {% if session_type != 'Qualifying'%}
-                        <thead>
-                            <tr>
-                                <th scope="col">Position</th>
-                                <th scope="col">Driver</th>
-                                <th scope="col">Fastest Lap</th>
-                                <th scope="col">Grid Slot</th>
-                                <th scope="col">Team</th>
-                                <th scope="col">Points</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in result %}
-                            <tr>
-                                <td>{{item[8]}}</td>
-                                <td>{{item[7]}}</td>
-                                <td>{{item[13]}}</td>
-                                <td>{{item[9]}}</td>
-                                <td>{{item[3]}}</td>
-                                <td>{{item[15]}}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                        {% else %}
-                        <thead>
-                            <tr>
-                                <th scope="col">Position</th>
-                                <th scope="col">Driver</th>
-                                <th scope="col">Q1</th>
-                                <th scope="col">Q2</th>
-                                <th scope="col">Q3</th>
-                                <th scope="col">Team</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in result %}
-                            <tr>
-                                <td>{{item[8]}}</td>
-                                <td>{{item[7]}}</td>
-                                <td>{{item[10]}}</td>
-                                <td>{{item[11]}}</td>
-                                <td>{{item[12]}}</td>
-                                <td>{{item[3]}}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                        {% endif %}
-                    </table>
-                </div>
-            </main>
-        </div>
+    <h2>Session Result - {{session_name}} - {{session_type}}</h2>
+    <div class="table-responsive">
+        <table class="table table-striped table-sm">
+            <!--<img class="card-img background" src={{ url_for('static', filename='background/Baharein.jpeg') }}>-->
+            {% if session_type != 'Qualifying'%}
+            <thead>
+                <tr>
+                    <th scope="col">Position</th>
+                    <th scope="col">Driver</th>
+                    <th scope="col">Fastest Lap</th>
+                    <th scope="col">Grid Slot</th>
+                    <th scope="col">Team</th>
+                    <th scope="col">Points</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in result %}
+                <tr>
+                    <td>{{item[8]}}</td>
+                    <td>{{item[7]}}</td>
+                    <td>{{item[13]}}</td>
+                    <td>{{item[9]}}</td>
+                    <td>{{item[3]}}</td>
+                    <td>{{item[15]}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            {% else %}
+            <thead>
+                <tr>
+                    <th scope="col">Position</th>
+                    <th scope="col">Driver</th>
+                    <th scope="col">Q1</th>
+                    <th scope="col">Q2</th>
+                    <th scope="col">Q3</th>
+                    <th scope="col">Team</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in result %}
+                <tr>
+                    <td>{{item[8]}}</td>
+                    <td>{{item[7]}}</td>
+                    <td>{{item[10]}}</td>
+                    <td>{{item[11]}}</td>
+                    <td>{{item[12]}}</td>
+                    <td>{{item[3]}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            {% endif %}
+        </table>
     </div>
-</body>
-
-</html>
+</main>
+</div>
+</div>
+{% endblock %}

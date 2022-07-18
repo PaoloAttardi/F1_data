@@ -38,7 +38,7 @@ app = Flask(__name__)
 @app.route("/")
 def getEventsList():
     x = datetime.datetime.now()
-    session = ff1.get_event_schedule(x.year)
+    session = ff1.get_event_schedule(x.year, include_testing=False)
     session = session.values.tolist()
     c = requests.get('http://ergast.com/api/f1/current/constructorStandings.json')
     d = requests.get('http://ergast.com/api/f1/current/driverStandings.json')
