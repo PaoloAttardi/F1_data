@@ -53,25 +53,34 @@ def getEvent(round, session):
     x = datetime.datetime.now()
     event = ff1.get_session(x.year,round,session)
     event.load()
-    result = event.results
     d = event.drivers
     drivers = []
+    result = event.results.values.tolist()
     for item in d:
         drivers.append(driverName[item])
+    if(session != 'Qualifying'):
+        for driver_result in result:
+            driver_result[13] = str(event.laps.pick_driver(driver_result[2]).pick_fastest()['LapTime'])[10:19]
+    else:
+        for driver_result in result:
+            driver_result[10] = str(driver_result[10])[10:19]
+            driver_result[11] = str(driver_result[11])[10:19]
+            driver_result[12] = str(driver_result[12])[10:19]
     if(request.method == 'POST'):
         firstDriver = request.form['FirstDriver']
         secondDriver = request.form['SecondDriver']
         typeOfAnalisys = request.form['Type']
         if(typeOfAnalisys == 'Telemetry'):
             file_name = DataTelemetry(firstDriver, secondDriver, event)
-            return render_template('dataAnalisys.html', drivers=drivers, result=result.values.tolist(), session_name = event.event.EventName,
+            return render_template('dataAnalisys.html', drivers=drivers, result=result, session_name = event.event.EventName,
                 session_type = session, file_name=file_name)
         else:
             file_name = RaceAnalisys(firstDriver, secondDriver, event)
-            return render_template('dataAnalisys.html', drivers=drivers, result=result.values.tolist(), session_name = event.event.EventName,
+            return render_template('dataAnalisys.html', drivers=drivers, result=result, session_name = event.event.EventName,
                 session_type = session, file_name=file_name)
-    return render_template('dataView.html', drivers=drivers, result=result.values.tolist(), session_name = event.event.EventName,
+    return render_template('dataView.html', drivers=drivers, result=result, session_name = event.event.EventName,
     session_type = session)
 
 if __name__ == "__main__":
+    # ff1.Cache.clear_cache('../cache')
     app.run(host="127.0.0.1", port=8080, debug=True)

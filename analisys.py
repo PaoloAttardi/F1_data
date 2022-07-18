@@ -94,7 +94,7 @@ def DataTelemetry(driver_1, driver_2, quali):
 
     # pd.DataFrame.to_csv(path_or_buf='F1_project/' + driver_1 + '_' + csv_name + '_Lap_time.csv', self=laps_driver_1)
     # pd.DataFrame.to_csv(path_or_buf='F1_project/' + driver_2 + '_' + csv_name + '_Lap_time.csv', self=laps_driver_2)
-    #writeData(lapData=laps_driver_1, header=laps_driver_1.head(0).columns)
+    # writeData(lapData=laps_driver_1, header=laps_driver_1.head(0).columns)
 
 def RaceAnalisys(driver_1, driver_2, race):
     ff1.Cache.enable_cache('../cache')
