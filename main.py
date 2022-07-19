@@ -46,7 +46,8 @@ def getEventsList():
     driver_Standings = d.json()
     return render_template('index.html', session=session, today=datetime.datetime.now(),
      constructor_Standings=constructor_Standings['MRData']['StandingsTable']["StandingsLists"][0]['ConstructorStandings'],
-     driver_Standings=driver_Standings['MRData']['StandingsTable']["StandingsLists"][0]['DriverStandings'])
+     driver_Standings=driver_Standings['MRData']['StandingsTable']["StandingsLists"][0]['DriverStandings'],
+     year=x.year)
 
 @app.route("/<int:round>/<string:session>", methods = ['GET', 'POST'])
 def getEvent(round, session):
