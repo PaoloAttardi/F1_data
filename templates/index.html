@@ -60,17 +60,19 @@
           <th scope="col">Points</th>
           <th scope="col">Wins</th>
           <th scope="col">Nationality</th>
+          <th scope="col"></th>
         </tr>
       </thead>
       <tbody>
         {% for constructor in constructor_Standings %}
         <tr>
           <td>{{constructor['position']}}</td>
-          <td>{{constructor['Constructor']['name']}} <img class="img-fluid" height="35" width="35" src={{ url_for('static',
-              filename='asset/team_logo/' + constructor['Constructor']['name'] + '.png' ) }}></td>
+          <td>{{constructor['Constructor']['name']}}</td>
           <td>{{constructor['points']}}</td>
           <td>{{constructor['wins']}}</td>
           <td>{{constructor['Constructor']['nationality']}}</td>
+          <td><img class="img-fluid" height="35" width="35" src={{ url_for('static',
+            filename='asset/team_logo/' + constructor['Constructor']['name'] + '.png' ) }}></td>
         </tr>
         {% endfor %}
       </tbody>
