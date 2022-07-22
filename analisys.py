@@ -96,12 +96,12 @@ def DataTelemetry(driver_1, driver_2, quali):
     # pd.DataFrame.to_csv(path_or_buf='F1_project/' + driver_2 + '_' + csv_name + '_Lap_time.csv', self=laps_driver_2)
     # writeData(lapData=laps_driver_1, header=laps_driver_1.head(0).columns)
 
-def RaceAnalisys(driver_1, driver_2, race):
+def RaceAnalisys(driver_1, driver_2, driver_3, driver_4, race):
     ff1.Cache.enable_cache('../cache')
 
     laps = race.load_laps()
 
-    plot_title = f"{race.event.year} {race.event.EventName} - {race.name} - {driver_1} VS {driver_2}"
+    plot_title = f"{race.event.year} {race.event.EventName} - {race.name} - {driver_1} VS {driver_2} VS {driver_3} VS {driver_4}"
     plot_filename = "static/image/" + plot_title.replace(" ", "") + ".png"
 
     # Convert laptimes to seconds
@@ -130,7 +130,7 @@ def RaceAnalisys(driver_1, driver_2, race):
     # Create 2 subplots (1 for the boxplot, 1 for the lap-by-lap comparison)
     fig, ax = plt.subplots(3)
 
-    drivers_to_visualize = [driver_1, driver_2]
+    drivers_to_visualize = [driver_1, driver_2, driver_3, driver_4]
 
     ##############################
     #

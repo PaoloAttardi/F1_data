@@ -31,6 +31,8 @@ driverName = {
     '63': 'RUS',
     '77': 'BOT',
     '27': 'HUL',
+    '19': 'DVR',
+    '88': 'KUB',
     }
 
 app = Flask(__name__)
@@ -76,7 +78,9 @@ def getEvent(round, session):
             return render_template('dataAnalisys.html', drivers=drivers, result=result, session_name = event.event.EventName,
                 session_type = session, file_name=file_name)
         else:
-            file_name = RaceAnalisys(firstDriver, secondDriver, event)
+            thirdDriver = request.form['ThirdDriver']
+            fourthDriver = request.form['FourthDriver']
+            file_name = RaceAnalisys(firstDriver, secondDriver, thirdDriver, fourthDriver, event)
             return render_template('dataAnalisys.html', drivers=drivers, result=result, session_name = event.event.EventName,
                 session_type = session, file_name=file_name)
     return render_template('dataView.html', drivers=drivers, result=result, session_name = event.event.EventName,
