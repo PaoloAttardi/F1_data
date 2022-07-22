@@ -53,6 +53,7 @@
                     <th scope="col">Grid Slot</th>
                     <th scope="col">Team</th>
                     <th scope="col">Points</th>
+                    <th scope="col"></th>
                 </tr>
             </thead>
             <tbody>
@@ -69,10 +70,12 @@
                     <td>{{item[9]}}</td>
                     <td>{{item[3]}}</td>
                     <td>{{item[15]}}</td>
+                    <td><img class="img-fluid" height="35" width="35" src={{ url_for('static',
+                        filename='asset/team_logo/' + item[3] + '.png' ) }}></td>
                 </tr>
                 {% endfor %}
             </tbody>
-            {% elif session_type == 'Qualifiyng' %}
+            {% elif session_type == 'Qualifying' %}
             <thead>
                 <tr>
                     <th scope="col">Position</th>
@@ -81,6 +84,7 @@
                     <th scope="col">Q2</th>
                     <th scope="col">Q3</th>
                     <th scope="col">Team</th>
+                    <th scope="col"></th>
                 </tr>
             </thead>
             <tbody>
@@ -97,6 +101,8 @@
                     <td>{{item[11]}}</td>
                     <td>{{item[12]}}</td>
                     <td>{{item[3]}}</td>
+                    <td><img class="img-fluid" height="35" width="35" src={{ url_for('static',
+                        filename='asset/team_logo/' + item[3] + '.png' ) }}></td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -106,9 +112,8 @@
                     <th scope="col">Position</th>
                     <th scope="col">Driver</th>
                     <th scope="col">Fastest Lap</th>
-                    <th scope="col">Grid Slot</th>
                     <th scope="col">Team</th>
-                    <th scope="col">Points</th>
+                    <th scope="col"></th>
                 </tr>
             </thead>
             <tbody>
@@ -122,9 +127,9 @@
                     </td>
                     <td>{{item[7]}}</td>
                     <td>{{item[13]}}</td>
-                    <td>{{item[9]}}</td>
                     <td>{{item[3]}}</td>
-                    <td>{{item[15]}}</td>
+                    <td><img class="img-fluid" height="35" width="35" src={{ url_for('static',
+                        filename='asset/team_logo/' + item[3] + '.png' ) }}></td>
                 </tr>
                 {% endfor %}
             </tbody>

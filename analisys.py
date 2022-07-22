@@ -7,9 +7,14 @@ from matplotlib.pyplot import figure
 
 import numpy as np
 import pandas as pd
+import os.path
 
 def DataTelemetry(driver_1, driver_2, quali):
-    ff1.Cache.enable_cache('../cache')
+    
+    plot_title = f"{quali.event.year} {quali.event.EventName} - {quali.name} - {driver_1} VS {driver_2}"
+    plot_filename = "static/image/" + plot_title.replace(" ", "") + ".png"
+    if(os.path.exists(plot_filename)):
+        return plot_filename
 
     # Laps can now be accessed through the .laps object coming from the session
     laps_driver_1 = quali.laps.pick_driver(driver_1)
@@ -30,10 +35,7 @@ def DataTelemetry(driver_1, driver_2, quali):
     delta_time, ref_tel, compare_tel = utils.delta_time(fastest_driver_1, fastest_driver_2)
 
     plot_size = [15, 15]
-    csv_name = f"{quali.event.year}_{quali.event.EventName}_{quali.name}"
-    plot_title = f"{quali.event.year} {quali.event.EventName} - {quali.name} - {driver_1} VS {driver_2}"
     plot_ratios = [1, 3, 2, 1, 1, 2, 1]
-    plot_filename = "static/image/" + plot_title.replace(" ", "") + ".png"
 
     # Make plot a bit bigger
     plt.rcParams['figure.figsize'] = plot_size
@@ -97,12 +99,13 @@ def DataTelemetry(driver_1, driver_2, quali):
     # writeData(lapData=laps_driver_1, header=laps_driver_1.head(0).columns)
 
 def RaceAnalisys(driver_1, driver_2, driver_3, driver_4, race):
-    ff1.Cache.enable_cache('../cache')
-
-    laps = race.load_laps()
 
     plot_title = f"{race.event.year} {race.event.EventName} - {race.name} - {driver_1} VS {driver_2} VS {driver_3} VS {driver_4}"
     plot_filename = "static/image/" + plot_title.replace(" ", "") + ".png"
+    if(os.path.exists(plot_filename)):
+        return plot_filename
+
+    laps = race.load_laps()
 
     # Convert laptimes to seconds
     laps['LapTimeSeconds'] = laps['LapTime'].dt.total_seconds()
