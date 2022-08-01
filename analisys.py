@@ -9,6 +9,16 @@ import numpy as np
 import pandas as pd
 import os.path
 
+trackStatus = {
+    '1': 'Track clear',
+    '2': 'Yellow flag',
+    '3': 'unknown',
+    '4': 'Safety Car',
+    '5': 'Red Flag',
+    '6': 'Virtual Safety',
+    '7': 'Virtual Safety',
+}
+
 def DataTelemetry(driver_1, driver_2, quali):
     
     plot_title = f"{quali.event.year} {quali.event.EventName} - {quali.name} - {driver_1} VS {driver_2}"
@@ -244,3 +254,22 @@ def RaceAnalisys(driver_1, driver_2, driver_3, driver_4, race):
 
     plt.savefig(plot_filename, dpi=300)
     return plot_filename
+    
+def DriversLap(drivers, event):
+    lapsD = event.laps.pick_drivers(drivers)
+    lapsD.drop(['Time', 'DriverNumber', 'Sector1SessionTime', 'Sector2SessionTime', 'Sector3SessionTime',
+    'SpeedI1', 'SpeedI2', 'SpeedFL', 'SpeedST', 'FreshTyre', 'LapStartTime', 'LapStartDate', 'IsAccurate', 'IsPersonalBest'], axis=1, inplace=True)
+    lapsD.rename(columns = {'Sector1Time':'Sector1','Sector2Time':'Sector2','Sector3Time':'Sector3'}, inplace=True)
+    columns_name = ['Driver', 'Team', 'LapTime', 'LapNumber', 'Stint', 'PitOutTime', 'PitInTime', 'Sector1', 'Sector2', 'Sector3', 'Compound', 'TyreLife', 'TrackStatus']
+    lapsD = lapsD.reindex(columns=columns_name)
+    laps = lapsD.values.tolist()
+    header = lapsD.columns.values
+    for lap in laps:
+        lap[2] = str(lap[2])[10:19]
+        lap[5] = str(lap[5])[10:19]
+        lap[6] = str(lap[6])[10:19]
+        lap[7] = str(lap[7])[10:19]
+        lap[8] = str(lap[8])[10:19]
+        lap[9] = str(lap[9])[10:19]
+        lap[12] = trackStatus[lap[12][0]]
+    return header,laps

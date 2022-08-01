@@ -5,7 +5,7 @@ import fastf1 as ff1
 import datetime
 import requests
 
-from analisys import DataTelemetry, RaceAnalisys
+from analisys import DataTelemetry, RaceAnalisys, DriversLap
 
 ff1.Cache.enable_cache('../cache')
 
@@ -62,9 +62,11 @@ def getEvent(round, session):
     for item in d:
         drivers.append(driverName[item])
     if(session != 'Qualifying'):
+        # get F.L. for every driver
         for driver_result in result:
             driver_result[13] = str(event.laps.pick_driver(driver_result[2]).pick_fastest()['LapTime'])[10:19]
     else:
+        # change lap time format for Q1, Q2, Q3
         for driver_result in result:
             driver_result[10] = str(driver_result[10])[10:19]
             driver_result[11] = str(driver_result[11])[10:19]
@@ -75,14 +77,16 @@ def getEvent(round, session):
         typeOfAnalisys = request.form['Type']
         if(typeOfAnalisys == 'Telemetry'):
             file_name = DataTelemetry(firstDriver, secondDriver, event)
+            header, laps = DriversLap([firstDriver, secondDriver], event)
             return render_template('dataAnalisys.html', drivers=drivers, result=result, session_name = event.event.EventName,
-                session_type = session, file_name=file_name)
+                session_type = session, file_name=file_name, header=header, laps=laps)
         else:
             thirdDriver = request.form['ThirdDriver']
             fourthDriver = request.form['FourthDriver']
             file_name = RaceAnalisys(firstDriver, secondDriver, thirdDriver, fourthDriver, event)
+            header, laps = DriversLap([firstDriver, secondDriver, thirdDriver, fourthDriver], event)
             return render_template('dataAnalisys.html', drivers=drivers, result=result, session_name = event.event.EventName,
-                session_type = session, file_name=file_name)
+                session_type = session, file_name=file_name, header=header, laps=laps)
     return render_template('dataView.html', drivers=drivers, result=result, session_name = event.event.EventName,
     session_type = session)
 

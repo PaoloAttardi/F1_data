@@ -1,3 +1,28 @@
 {% extends "dataView.html" %}
 
 {% block data %} <img class="img-fluid" src={{ url_for('static', filename='../' + file_name) }}> {% endblock %}
+
+{% block lapsTable %}
+
+<h2>Laps from Drivers - {{session_name}} - {{session_type}}</h2>
+<div class="table-responsive">
+    <table class="table table-striped table-sm">
+        <thead>
+            <tr>
+                {% for colName in header %}
+                <th scope="col">{{ colName }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in laps %}
+            <tr>
+                {% for colValue in item %}
+                <td>{{ colValue }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
