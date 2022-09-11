@@ -150,9 +150,15 @@ def RaceAnalisys(driver_1, driver_2, driver_3, driver_4, race):
     # Boxplot for average racepace
     #
     ##############################
-    laptimes = [laps.pick_driver(x)['LapTimeSeconds'].dropna() for x in drivers_to_visualize] 
+    xlab = []
+    laptimes = [laps.pick_driver(x)['LapTimeSeconds'].dropna() for x in drivers_to_visualize]
+    for d in range(len(drivers_to_visualize)):
+        medians = np.mean(laptimes[d])
+        medians = round(medians,2)
+        xlab.append(drivers_to_visualize[d] + ' ' + str(medians))
+        print(xlab)
 
-    ax[0].boxplot(laptimes, labels=drivers_to_visualize)
+    ax[0].boxplot(laptimes, labels=xlab)
 
     ax[0].set_title('Average racepace comparison')
     ax[0].set(ylabel = 'Laptime (s)')
@@ -227,7 +233,6 @@ def RaceAnalisys(driver_1, driver_2, driver_3, driver_4, race):
         
         previous_stint_end = 0
         for _, stint in stints.iterrows():
-            print(stint)
             plt.barh(
                 [driver], 
                 stint['StintLength'], 
@@ -257,8 +262,11 @@ def RaceAnalisys(driver_1, driver_2, driver_3, driver_4, race):
     
 def DriversLap(drivers, event):
     lapsD = event.laps.pick_drivers(drivers)
-    lapsD.drop(['Time', 'DriverNumber', 'Sector1SessionTime', 'Sector2SessionTime', 'Sector3SessionTime',
-    'SpeedI1', 'SpeedI2', 'SpeedFL', 'SpeedST', 'FreshTyre', 'LapStartTime', 'LapStartDate', 'IsAccurate', 'IsPersonalBest'], axis=1, inplace=True)
+    if len(drivers) == 2:
+        lapsD.drop(['Time', 'DriverNumber', 'Sector1SessionTime', 'Sector2SessionTime', 'Sector3SessionTime',
+        'SpeedI1', 'SpeedI2', 'SpeedFL', 'SpeedST', 'FreshTyre', 'LapStartTime', 'LapStartDate', 'IsAccurate', 'IsPersonalBest'], axis=1, inplace=True)
+    else: lapsD.drop(['Time', 'DriverNumber', 'Sector1SessionTime', 'Sector2SessionTime', 'Sector3SessionTime',
+        'SpeedI1', 'SpeedI2', 'SpeedFL', 'SpeedST', 'FreshTyre', 'LapStartTime', 'IsAccurate', 'IsPersonalBest'], axis=1, inplace=True)
     lapsD.rename(columns = {'Sector1Time':'Sector1','Sector2Time':'Sector2','Sector3Time':'Sector3'}, inplace=True)
     columns_name = ['Driver', 'Team', 'LapTime', 'LapNumber', 'Stint', 'PitOutTime', 'PitInTime', 'Sector1', 'Sector2', 'Sector3', 'Compound', 'TyreLife', 'TrackStatus']
     lapsD = lapsD.reindex(columns=columns_name)
