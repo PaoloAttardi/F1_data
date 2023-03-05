@@ -11,6 +11,7 @@ ff1.Cache.enable_cache('../cache')
 
 driverName = {
     '1': 'VER',
+    '2': 'SAE',
     '3': 'RIC',
     '4': 'NOR',
     '5': 'VET',
@@ -33,7 +34,8 @@ driverName = {
     '27': 'HUL',
     '19': 'DVR',
     '88': 'KUB',
-    '45': 'NDV'
+    '21': 'NDV',
+    '81': 'PIA'
     }
 
 app = Flask(__name__)
@@ -93,4 +95,4 @@ def getEvent(round, session):
 
 if __name__ == "__main__":
     # ff1.Cache.clear_cache('../cache')
-    app.run(host="127.0.0.1", port=8080, debug=True)
+    app.run(host="0.0.0.0", port=80, debug=True)
