@@ -8,6 +8,7 @@ from matplotlib.pyplot import figure
 import numpy as np
 import pandas as pd
 import os.path
+import seaborn as sns
 
 trackStatus = {
     '1': 'Track clear',
@@ -141,7 +142,7 @@ def RaceAnalisys(driver_1, driver_2, driver_3, driver_4, race):
     plt.rcParams['figure.figsize'] = [10, 10]
 
     # Create 2 subplots (1 for the boxplot, 1 for the lap-by-lap comparison)
-    fig, ax = plt.subplots(3)
+    fig, ax = plt.subplots(4)
 
     drivers_to_visualize = [driver_1, driver_2, driver_3, driver_4]
 
@@ -208,6 +209,15 @@ def RaceAnalisys(driver_1, driver_2, driver_3, driver_4, race):
         # Add the team to the visualized teams variable so that the next time the linestyle will be different
         visualized_teams.append(team)
 
+    drivers_laps = laps.pick_driver(drivers_to_visualize)
+    print(pd.DataFrame(drivers_laps), 'ciao')
+    sns.lineplot(drivers_laps, x='LapNumber', y='LapTimeSeconds', hue='Driver', markers=True, ax=ax[2])
+
+    ax[2].set(ylabel = 'Laptime (s)')
+    ax[2].set(xlabel = 'Lap')
+
+    ax[2].set_title('lap-by-lap racepace')
+
     # Add the strategy analisys to the plot
     driver_stints = laps[['Driver', 'Stint', 'Compound', 'LapNumber']].groupby(
     ['Driver', 'Stint', 'Compound']).count().reset_index()
@@ -253,9 +263,11 @@ def RaceAnalisys(driver_1, driver_2, driver_3, driver_4, race):
     plt.gca().invert_yaxis()
 
     # Remove frame from plot
-    ax[2].spines['top'].set_visible(False)
-    ax[2].spines['right'].set_visible(False)
-    ax[2].spines['left'].set_visible(False)
+    ax[3].spines['top'].set_visible(False)
+    ax[3].spines['right'].set_visible(False)
+    ax[3].spines['left'].set_visible(False)
+
+    fig.tight_layout(pad=2.5)
 
     plt.savefig(plot_filename, dpi=300)
     return plot_filename

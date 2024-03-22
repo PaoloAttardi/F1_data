@@ -27,8 +27,7 @@
         aria-expanded="false" aria-controls=collapse{{item[5]}}>
         {% if today > item[4] %}
         <span class="badge bg-primary rounded-pill">concluso</span>
-        {% elif today > item[8] %}
-        <span class="badge bg-success rounded-pill">in corso</span>
+        <!--<span class="badge bg-success rounded-pill">in corso</span>-->
         {% else %}
         <span class="badge bg-danger rounded-pill">da disputare</span>
         {% endif %}
@@ -38,9 +37,9 @@
           <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Choose
             Session</button>
           <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href={{item[0]}}\Practice%201>{{item[7]}}</a></li>
-            <li><a class="dropdown-item" href={{item[0]}}\Practice%202>{{item[9]}}</a></li>
-            <li><a class="dropdown-item" href={{item[0]}}\Practice%203>{{item[11]}}</a></li>
+            <li><a class="dropdown-item" href='{{item[0]}}\{{item[7]}}'>{{item[7]}}</a></li>
+            <li><a class="dropdown-item" href='{{item[0]}}\{{item[9]}}'>{{item[9]}}</a></li>
+            <li><a class="dropdown-item" href='{{item[0]}}\{{item[11]}}'>{{item[11]}}</a></li>
             <li><a class="dropdown-item" href={{item[0]}}\{{item[13]}}>{{item[13]}}</a></li>
             <li><a class="dropdown-item" href={{item[0]}}\{{item[15]}}>{{item[15]}}</a></li>
           </ul>

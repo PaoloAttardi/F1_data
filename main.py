@@ -3,6 +3,7 @@ from flask import render_template
 from flask import request
 import fastf1 as ff1
 import datetime
+import pytz
 import requests
 
 from analisys import DataTelemetry, RaceAnalisys, DriversLap
@@ -61,19 +62,21 @@ def getEvent(round, session):
     event.load()
     d = event.drivers
     drivers = []
-    result = event.results.values.tolist()
     for item in d:
         drivers.append(driverName[item])
     if(session != 'Qualifying'):
+        result = event.results[['Position','FullName','GridPosition','TeamName','Points','Abbreviation']].values.tolist()
         # get F.L. for every driver
         for driver_result in result:
-            driver_result[13] = str(event.laps.pick_driver(driver_result[2]).pick_fastest()['LapTime'])[10:19]
+            driver_result.append(str(event.laps.pick_driver(driver_result[5]).pick_fastest()['LapTime'])[10:19])
+        # result.sort(key=['LapTime']) need to be sorted
     else:
         # change lap time format for Q1, Q2, Q3
+        result = event.results[['Position','FullName','TeamName','Q1','Q2','Q3']].values.tolist()
         for driver_result in result:
-            driver_result[10] = str(driver_result[10])[10:19]
-            driver_result[11] = str(driver_result[11])[10:19]
-            driver_result[12] = str(driver_result[12])[10:19]
+            driver_result[3] = str(driver_result[3])[10:19]
+            driver_result[4] = str(driver_result[4])[10:19]
+            driver_result[5] = str(driver_result[5])[10:19]
     if(request.method == 'POST'):
         firstDriver = request.form['FirstDriver']
         secondDriver = request.form['SecondDriver']

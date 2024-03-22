@@ -61,17 +61,12 @@
             <tbody>
                 {% for item in result %}
                 <tr>
-                    <td>
-                        <script>
-                            position = position + 1;
-                            document.write(position);
-                        </script>
-                    </td>
-                    <td>{{item[7]}}</td>
-                    <td>{{item[13]}}</td>
-                    <td>{{item[9]}}</td>
+                    <td>{{item[0]}}</td>
+                    <td>{{item[1]}}</td>
+                    <td>{{item[6]}}</td>
+                    <td>{{item[2]}}</td>
                     <td>{{item[3]}}</td>
-                    <td>{{item[15]}}</td>
+                    <td>{{item[4]}}</td>
                     <td><img class="img-fluid" height="35" width="35" src={{ url_for('static',
                         filename='asset/team_logo/' + item[3] + '.png' ) }}></td>
                 </tr>
@@ -92,19 +87,14 @@
             <tbody>
                 {% for item in result %}
                 <tr>
-                    <td>
-                        <script>
-                            position = position + 1;
-                            document.write(position);
-                        </script>
-                    </td>
-                    <td>{{item[7]}}</td>
-                    <td>{{item[10]}}</td>
-                    <td>{{item[11]}}</td>
-                    <td>{{item[12]}}</td>
+                    <td>{{item[0]}}</td>
+                    <td>{{item[1]}}</td>
                     <td>{{item[3]}}</td>
+                    <td>{{item[4]}}</td>
+                    <td>{{item[5]}}</td>
+                    <td>{{item[2]}}</td>
                     <td><img class="img-fluid" height="35" width="35" src={{ url_for('static',
-                        filename='asset/team_logo/' + item[3] + '.png' ) }}></td>
+                        filename='asset/team_logo/' + item[2] + '.png' ) }}></td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -127,8 +117,8 @@
                             document.write(position);
                         </script>
                     </td>
-                    <td>{{item[7]}}</td>
-                    <td>{{item[13]}}</td>
+                    <td>{{item[1]}}</td>
+                    <td>{{item[6]}}</td>
                     <td>{{item[3]}}</td>
                     <td><img class="img-fluid" height="35" width="35" src={{ url_for('static',
                         filename='asset/team_logo/' + item[3] + '.png' ) }}></td>
