@@ -1,3 +1,5 @@
 # F1 DATA
 
-to run the application go to main.py and run it, you can connect to the website via link.
+The application allow the analysis of two main aspect over a F1 session:
+- One Lap Pace with telemetry
+- Race Pace with mean time, tyre strategy and a smoothed view of the pace for 4 driver at time
