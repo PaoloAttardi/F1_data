@@ -1,82 +1,60 @@
 from flask import Flask
 from flask import render_template
 from flask import request
-import fastf1 as ff1
-import datetime
-import pytz
-import requests
-
+from fastf1.ergast import Ergast
 from analisys import DataTelemetry, RaceAnalisys, DriversLap
 
-ff1.Cache.enable_cache('../cache')
+import fastf1 as ff1
+import datetime
+import requests
 
-driverName = {
-    '1': 'VER',
-    '2': 'SAE',
-    '3': 'RIC',
-    '4': 'NOR',
-    '5': 'VET',
-    '6': 'LAT',
-    '10': 'GAS',
-    '11': 'PER',
-    '14': 'ALO',
-    '16': 'LEC',
-    '18': 'STR',
-    '20': 'MAG',
-    '22': 'TSU',
-    '23': 'ALB',
-    '24': 'ZHO',
-    '31': 'OCO',
-    '44': 'HAM',
-    '47': 'SCH',
-    '55': 'SAI',
-    '63': 'RUS',
-    '77': 'BOT',
-    '27': 'HUL',
-    '19': 'DVR',
-    '88': 'KUB',
-    '21': 'NDV',
-    '81': 'PIA'
-    }
+ff1.Cache.enable_cache('cache')
+ergast = Ergast()
 
 app = Flask(__name__)
 
 @app.route("/")
-def getEventsList():
+def LoadHomePage():
     x = datetime.datetime.now()
-    session = ff1.get_event_schedule(x.year, include_testing=False)
-    session = session.values.tolist()
-    c = requests.get('http://ergast.com/api/f1/current/constructorStandings.json')
-    d = requests.get('http://ergast.com/api/f1/current/driverStandings.json')
-    constructor_Standings = c.json()
-    driver_Standings = d.json()
+    session = ff1.get_event_schedule(x.year, include_testing=True).values.tolist()
+    constructor_Standings = ergast.get_constructor_standings(season=x.year,result_type='raw')
+    driver_Standings = ergast.get_driver_standings(season=x.year,result_type='raw')
     return render_template('index.html', session=session, today=datetime.datetime.now(),
-     constructor_Standings=constructor_Standings['MRData']['StandingsTable']["StandingsLists"][0]['ConstructorStandings'],
-     driver_Standings=driver_Standings['MRData']['StandingsTable']["StandingsLists"][0]['DriverStandings'],
+     constructor_Standings=constructor_Standings[0]['ConstructorStandings'],
+     driver_Standings=driver_Standings[0]['DriverStandings'],
      year=x.year)
 
 @app.route("/<int:round>/<string:session>", methods = ['GET', 'POST'])
 def getEvent(round, session):
     x = datetime.datetime.now()
-    event = ff1.get_session(x.year,round,session)
+    if round == 0: 
+        event = ff1.get_testing_session(x.year,1,int(session.split()[-1])) # hardcoded test_number = 1, will break if multiple tests take places in the same year
+    else: event = ff1.get_session(x.year,round,session)
     event.load()
-    d = event.drivers
-    drivers = []
-    for item in d:
-        drivers.append(driverName[item])
+    drivers = {}
     if(session != 'Qualifying'):
-        result = event.results[['Position','FullName','GridPosition','TeamName','Points','Abbreviation']].values.tolist()
+        result = event.results[['Position','FullName','GridPosition','TeamName','Points','Abbreviation','DriverNumber']]
+        result = result.copy()
+        result.loc[:, 'LapTime'] = 'No Recorded Time'
         # get F.L. for every driver
-        for driver_result in result:
-            driver_result.append(str(event.laps.pick_driver(driver_result[5]).pick_fastest()['LapTime'])[10:19])
-        # result.sort(key=['LapTime']) need to be sorted
+        for idx in range(len(result)):
+            drivers[result['DriverNumber'].iloc[idx]] = result['Abbreviation'].iloc[idx]
+            if event.laps.pick_drivers(result['Abbreviation'].iloc[idx]).pick_fastest() is not None: 
+                result.loc[result['DriverNumber'].iloc[idx], 'LapTime'] = str(event.laps.pick_drivers(result['Abbreviation'].iloc[idx]).pick_fastest()['LapTime'])[10:19]
+        if result['Position'].isna().all(): 
+            result.sort_values(by='LapTime', ignore_index=True, inplace=True) # need to be sorted for test events
+            result.loc[:,'Position'] = result.index + 1
+
     else:
         # change lap time format for Q1, Q2, Q3
-        result = event.results[['Position','FullName','TeamName','Q1','Q2','Q3']].values.tolist()
-        for driver_result in result:
-            driver_result[3] = str(driver_result[3])[10:19]
-            driver_result[4] = str(driver_result[4])[10:19]
-            driver_result[5] = str(driver_result[5])[10:19]
+        result = event.results[['Position','FullName','TeamName','Q1','Q2','Q3','Abbreviation','DriverNumber']]
+        result[["Q1", "Q2", "Q3"]] = result[["Q1", "Q2", "Q3"]].astype(str)
+        for idx in range(len(result)):
+            drivers[result['DriverNumber'].iloc[idx]] = result['Abbreviation'].iloc[idx]
+            result.loc[result['DriverNumber'].iloc[idx], 'Q1'] = result['Q1'].iloc[idx][10:19]
+            result.loc[result['DriverNumber'].iloc[idx], 'Q2'] = result['Q2'].iloc[idx][10:19]
+            result.loc[result['DriverNumber'].iloc[idx], 'Q3'] = result['Q3'].iloc[idx][10:19]
+            
     if(request.method == 'POST'):
         firstDriver = request.form['FirstDriver']
         secondDriver = request.form['SecondDriver']
@@ -93,9 +71,9 @@ def getEvent(round, session):
             header, laps = DriversLap([firstDriver, secondDriver, thirdDriver, fourthDriver], event)
             return render_template('dataAnalisys.html', drivers=drivers, result=result, session_name = event.event.EventName,
                 session_type = session, file_name=file_name, header=header, laps=laps)
-    return render_template('dataView.html', drivers=drivers, result=result, session_name = event.event.EventName,
+    return render_template('dataView.html', drivers=drivers, result=result.values.tolist(), session_name = event.event.EventName,
     session_type = session)
 
 if __name__ == "__main__":
-    # ff1.Cache.clear_cache('../cache')
+    ff1.Cache.clear_cache('cache')
     app.run(host="0.0.0.0", port=80, debug=True)
