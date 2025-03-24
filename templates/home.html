@@ -17,31 +17,38 @@
   </div>
 
   <ol class="list-group list-group-numbered">
-    {% for item in session %}
+    {% for idx in range(session|length)%}
     <li class="list-group-item justify-content-between align-items-start d-flex">
       <div class="ms-2 me-auto">
-        <div class="fw-bold">{{item[3]}}</div>
-        {{item[1]}} &#x2022; {{item[5]}}
+        <div class="fw-bold">{{session.loc[idx, 'OfficialEventName']}}</div>
+        {{session.loc[idx, 'Country']}} &#x2022; {{session.loc[idx, 'EventName']}}
       </div>
-      <button class="btn" type="button" data-bs-toggle="collapse" data-bs-target=#collapse{{item[5]}}
-        aria-expanded="false" aria-controls=collapse{{item[5]}}>
-        {% if today > item[4] %}
+      <button class="btn" type="button" data-bs-toggle="collapse" data-bs-target=#collapse{{session.loc[idx, 'EventName']}}
+        aria-expanded="false" aria-controls=collapse{{session.loc[idx, 'EventName']}}>
+        {% if today > session.loc[idx, 'EventDate'] %}
         <span class="badge bg-primary rounded-pill">concluso</span>
         <!--<span class="badge bg-success rounded-pill">in corso</span>-->
         {% else %}
         <span class="badge bg-danger rounded-pill">da disputare</span>
         {% endif %}
       </button>
-      <div class="collapse" id=collapse{{item[5]}}>
+      <div class="collapse" id=collapse{{session.loc[idx, 'EventName']}}>
         <div class="input-group mb-3">
           <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Choose
             Session</button>
           <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href='{{item[0]}}\{{item[7]}}'>{{item[7]}}</a></li>
-            <li><a class="dropdown-item" href='{{item[0]}}\{{item[10]}}'>{{item[10]}}</a></li>
-            <li><a class="dropdown-item" href='{{item[0]}}\{{item[13]}}'>{{item[13]}}</a></li>
-            <li><a class="dropdown-item" href={{item[0]}}\{{item[16]}}>{{item[16]}}</a></li>
-            <li><a class="dropdown-item" href={{item[0]}}\{{item[19]}}>{{item[19]}}</a></li>
+            <li><a class="dropdown-item" href="Practice\{{session.loc[idx, 'RoundNumber']}}\{{session.loc[idx, 'Session1']}}">{{session.loc[idx, 'Session1']}}</a></li>
+            {% if session.loc[idx, 'Session2'] == 'Practice 2' %}
+              <li><a class="dropdown-item" href="Practice\{{session.loc[idx, 'RoundNumber']}}\{{session.loc[idx, 'Session2']}}">{{session.loc[idx, 'Session2']}}</a></li>
+              <li><a class="dropdown-item" href="Practice\{{session.loc[idx, 'RoundNumber']}}\{{session.loc[idx, 'Session3']}}">{{session.loc[idx, 'Session3']}}</a></li>
+            {% else %}
+              <li><a class="dropdown-item" href="Qualify\{{session.loc[idx, 'RoundNumber']}}\{{session.loc[idx, 'Session2']}}">{{session.loc[idx, 'Session2']}}</a></li>
+              <li><a class="dropdown-item" href="Race\{{session.loc[idx, 'RoundNumber']}}\{{session.loc[idx, 'Session3']}}">{{session.loc[idx, 'Session3']}}</a></li>
+            {% endif %}
+            {% if session.loc[idx, 'Session4'] == 'Qualifying' %}
+              <li><a class="dropdown-item" href="Qualify\{{session.loc[idx, 'RoundNumber']}}\{{session.loc[idx, 'Session4']}}">{{session.loc[idx, 'Session4']}}</a></li>
+              <li><a class="dropdown-item" href="Race\{{session.loc[idx, 'RoundNumber']}}\{{session.loc[idx, 'Session5']}}">{{session.loc[idx, 'Session5']}}</a></li>
+            {% endif %}
           </ul>
         </div>
       </div>
@@ -114,9 +121,8 @@
                 </table>
             </div>
         </div>
+      </div>
     </div>
-</div>
-  </div>
 </main>
 
 {% endblock %}

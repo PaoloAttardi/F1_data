@@ -1,0 +1,77 @@
+{% extends 'navbar.html'%}
+{% block content %}
+<main class=" ms-sm-auto mt-5 px-md-4">
+    <!--<form method="post">
+        <div
+            class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">Select Drivers and type of Analisys</h1>
+        </div>
+        <div class="row">
+            <div class="col">
+                <select class="form-control" id="FirstDriver" name="FirstDriver" required>
+                    <option value="" selected disabled>First Driver Number</option>
+                    {% for driver in drivers %}
+                    <option value={{driver}}>{{driver}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col">
+                <select class="form-control" id="SecondDriver" name="SecondDriver" required>
+                    <option value="" selected disabled>Second Driver Number</option>
+                    {% for driver in drivers %}
+                    <option value={{driver}}>{{driver}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col">
+                <select onchange="newForm()" class="form-control" id="Type" name="Type">
+                    <option value="Telemetry" selected>Telemetry</option>
+                    <option value="Race">Race pace</option>
+                </select>
+            </div>
+            <div class="col">
+                <button type="submit" class="btn btn-primary mb-3">Search</button>
+            </div>
+            <div id="select" class="row row-cols-4"></div>
+        </div>
+    </form>-->
+    <div class="container mt-5">
+    <!-- Session Results -->
+        <h2 class="mb-4 pt-3 pb-2 text-center">Session Result - {{session_name}} - {{session_type}}</h2>
+        <div class="table-responsive">
+            <table class="table text-center">
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col">Position</th>
+                        <th scope="col">Driver</th>
+                        <th scope="col">Fastest Lap</th>
+                        <th scope="col">Grid Slot</th>
+                        <th scope="col">Team</th>
+                        <th scope="col">Points</th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in result %}
+                    <tr>
+                        <td>{{item[0]}}</td>
+                        <td>{{item[1]}}</td>
+                        <td>{{item[7]}}</td>
+                        <td>{{item[2]}}</td>
+                        <td>{{item[3]}}</td>
+                        <td>{{item[4]}}</td>
+                        <td><img class="img-fluid" height="35" width="35" src={{ url_for('static',
+                            filename='asset/team_logo/' + item[3] + '.png' ) }}></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {% block data %} <img class="img-fluid" src={{ url_for('static', filename='../' + file_name) }}> {% endblock %}
+
+    {% block lapsTable %} {% endblock %}
+</main>
+
+{% endblock %}

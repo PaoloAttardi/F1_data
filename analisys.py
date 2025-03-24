@@ -3,12 +3,11 @@ from fastf1 import plotting
 from fastf1 import utils
 
 from matplotlib import pyplot as plt
-from matplotlib.pyplot import figure
 
 import numpy as np
 import pandas as pd
 import os.path
-import seaborn as sns
+import fastf1 as ff1
 
 trackStatus = {
     '1': 'Track clear',
@@ -109,14 +108,14 @@ def DataTelemetry(driver_1, driver_2, quali):
     # pd.DataFrame.to_csv(path_or_buf='F1_project/' + driver_2 + '_' + csv_name + '_Lap_time.csv', self=laps_driver_2)
     # writeData(lapData=laps_driver_1, header=laps_driver_1.head(0).columns)
 
-def RaceAnalisys(driver_1, driver_2, driver_3, driver_4, race):
+def RaceAnalisys(race, drivers):
 
-    plot_title = f"{race.event.year} {race.event.EventName} - {race.name} - {driver_1} VS {driver_2} VS {driver_3} VS {driver_4}"
+    plot_title = f"{race.event.year} {race.event.EventName} - {race.name}"
     plot_filename = "static/image/" + plot_title.replace(" ", "") + ".png"
-    if(os.path.exists(plot_filename)):
-        return plot_filename
+    #if(os.path.exists(plot_filename)):
+     #   return plot_filename
 
-    laps = race.load_laps()
+    laps = race.laps
 
     # Convert laptimes to seconds
     laps['LapTimeSeconds'] = laps['LapTime'].dt.total_seconds()
@@ -126,43 +125,57 @@ def RaceAnalisys(driver_1, driver_2, driver_3, driver_4, race):
 
     # Also, we remove outliers since those don't represent the racepace,
     # using the Inter-Quartile Range (IQR) proximity rule
-    q75, q25 = laps['LapTimeSeconds'].quantile(0.75), laps['LapTimeSeconds'].quantile(0.25)
+    # q75, q25 = laps['LapTimeSeconds'].quantile(0.75), laps['LapTimeSeconds'].quantile(0.25)
+    # intr_qr = q75 - q25
+    # laptime_max = q75 + (1.5 * intr_qr) # IQR proximity rule: Max = q75 + 1,5 * IQR
+    # laptime_min = q25 - (1.5 * intr_qr) # IQR proximity rule: Min = q25 + 1,5 * IQR
 
-    intr_qr = q75 - q25
-
-    laptime_max = q75 + (1.5 * intr_qr) # IQR proximity rule: Max = q75 + 1,5 * IQR
-    laptime_min = q25 - (1.5 * intr_qr) # IQR proximity rule: Min = q25 + 1,5 * IQR
-
-    laps.loc[laps['LapTimeSeconds'] < laptime_min, 'LapTimeSeconds'] = np.nan
-    laps.loc[laps['LapTimeSeconds'] > laptime_max, 'LapTimeSeconds'] = np.nan
+    # laps.loc[laps['LapTimeSeconds'] < laptime_min, 'LapTimeSeconds'] = np.nan
+    # laps.loc[laps['LapTimeSeconds'] > laptime_max, 'LapTimeSeconds'] = np.nan
     # To make sure we won't get any equally styled lines when comparing teammates
-    visualized_teams = []
+    visualized_teams = set()
 
     # Make plot a bit bigger
-    plt.rcParams['figure.figsize'] = [10, 10]
+    plt.rcParams['figure.figsize'] = [15, 25]
 
     # Create 2 subplots (1 for the boxplot, 1 for the lap-by-lap comparison)
     fig, ax = plt.subplots(4)
 
-    drivers_to_visualize = [driver_1, driver_2, driver_3, driver_4]
+    drivers_to_visualize = list(drivers.values())
 
     ##############################
     #
     # Boxplot for average racepace
     #
     ##############################
+    laptimes = laps.pick_drivers(drivers_to_visualize)[['Driver','LapTimeSeconds']].dropna()
     xlab = []
-    laptimes = [laps.pick_driver(x)['LapTimeSeconds'].dropna() for x in drivers_to_visualize]
-    for d in range(len(drivers_to_visualize)):
-        medians = np.mean(laptimes[d])
-        medians = round(medians,2)
-        xlab.append(drivers_to_visualize[d] + ' ' + str(medians))
-        print(xlab)
+    lap_data = []
 
-    ax[0].boxplot(laptimes, labels=xlab)
+    for driver in drivers_to_visualize[:9]:
+        driver_laps = laptimes.loc[laptimes['Driver'] == driver, 'LapTimeSeconds']
+        median_time = round(driver_laps.mean(), 2)
+        xlab.append(driver + ' ' + str(median_time))
+        lap_data.append(driver_laps.values)
+
+    ax[0].boxplot(lap_data, labels=xlab)
 
     ax[0].set_title('Average racepace comparison')
     ax[0].set(ylabel = 'Laptime (s)')
+
+    xlab = []
+    lap_data = []
+
+    for driver in drivers_to_visualize[9:]:
+        driver_laps = laptimes.loc[laptimes['Driver'] == driver, 'LapTimeSeconds']
+        median_time = round(driver_laps.mean(), 2)
+        xlab.append(driver + ' ' + str(median_time))
+        lap_data.append(driver_laps.values)
+
+    ax[1].boxplot(lap_data, labels=xlab)
+
+    ax[1].set_title('Average racepace comparison')
+    ax[1].set(ylabel = 'Laptime (s)')
 
     ##############################
     #
@@ -170,57 +183,54 @@ def RaceAnalisys(driver_1, driver_2, driver_3, driver_4, race):
     #
     ##############################
     for driver in drivers_to_visualize:
-        driver_laps = laps.pick_driver(driver)[['LapNumber', 'LapTimeSeconds', 'Team']]
+        driver_laps = laps.pick_drivers(driver)[['LapNumber', 'LapTimeSeconds', 'Team']]
         
-        # Select all the laps from that driver
-        driver_laps = driver_laps.dropna()
-        
-        # Extract the team for coloring purploses
-        team = pd.unique(driver_laps['Team'])[0]
-        
-        # X-coordinate is the lap number
-        x = driver_laps['LapNumber']
-        
-        # Y-coordinate a smoothed line between all the laptimes
-        poly = np.polyfit(driver_laps['LapNumber'], driver_laps['LapTimeSeconds'], 5)
-        y_poly = np.poly1d(poly)(driver_laps['LapNumber'])
-        
-        # Make sure that two teammates don't get the same line style
-        linestyle = '-' if team not in visualized_teams else ':'
-        
-        # Plot the data
-        ax[1].plot(x, y_poly, label=driver, color=ff1.plotting.team_color(team), linestyle=linestyle)
-        
-        # Include scatterplot (individual laptimes)
-        # y = driver_laps['LapTimeSeconds']
-        # scatter_marker = 'o' if team not in visualized_teams else '^' 
-        # ax[1].scatter(x, y, label=driver, color=ff1.plotting.team_color(team), marker=scatter_marker)
-        
-        # Append labels
-        ax[1].set(ylabel = 'Laptime (s)')
-        ax[1].set(xlabel = 'Lap')
-        
-        # Set title
-        ax[1].set_title('Smoothed lap-by-lap racepace')
+        if driver_laps['LapTimeSeconds'].notna().all():
+            # Extract the team for coloring purploses
+            team = pd.unique(driver_laps['Team'])[0]
+            
+            # X-coordinate is the lap number
+            x = driver_laps['LapNumber']
+            
+            # Y-coordinate a smoothed line between all the laptimes
+            poly = np.polyfit(driver_laps['LapNumber'], driver_laps['LapTimeSeconds'], 3)
+            y_poly = np.poly1d(poly)(driver_laps['LapNumber'])
+            
+            # Make sure that two teammates don't get the same line style
+            linestyle = '-' if team not in visualized_teams else ':'
+            
+            # Plot the data
+            # ax[2].plot(x, y_poly, label=driver, color=ff1.plotting.get_team_color(team, race), linestyle=linestyle)
+            
+            # Include scatterplot (individual laptimes)
+            y = driver_laps['LapTimeSeconds']
+            scatter_marker = 'o' if team not in visualized_teams else '^' 
+            ax[2].scatter(x, y, label=driver, color=ff1.plotting.get_team_color(team, race), marker=scatter_marker)
+            
+            # Add the team to the visualized teams variable so that the next time the linestyle will be different
+            visualized_teams.add(team)
 
-        # Generate legend
-        ax[1].legend()
-        
-        # Add the team to the visualized teams variable so that the next time the linestyle will be different
-        visualized_teams.append(team)
+    # Append labels
+    ax[2].set(ylabel = 'Laptime (s)')
+    ax[2].set(xlabel = 'Lap')
+    
+    # Set title
+    ax[2].set_title('Smoothed lap-by-lap racepace')
 
-    drivers_laps = laps.pick_driver(drivers_to_visualize)
+    # Generate legend
+    ax[2].legend()
+
+    """drivers_laps = laps.pick_driver(drivers_to_visualize)
     print(pd.DataFrame(drivers_laps), 'ciao')
     sns.lineplot(drivers_laps, x='LapNumber', y='LapTimeSeconds', hue='Driver', markers=True, ax=ax[2])
 
     ax[2].set(ylabel = 'Laptime (s)')
     ax[2].set(xlabel = 'Lap')
 
-    ax[2].set_title('lap-by-lap racepace')
+    ax[2].set_title('lap-by-lap racepace')"""
 
     # Add the strategy analisys to the plot
-    driver_stints = laps[['Driver', 'Stint', 'Compound', 'LapNumber']].groupby(
-    ['Driver', 'Stint', 'Compound']).count().reset_index()
+    driver_stints = laps[['Driver', 'Stint', 'Compound', 'LapNumber']].groupby(['Driver', 'Stint', 'Compound']).count().reset_index()
 
     driver_stints = driver_stints.rename(columns={'LapNumber': 'StintLength'})
 
